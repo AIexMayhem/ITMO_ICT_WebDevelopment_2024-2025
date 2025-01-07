@@ -5,13 +5,13 @@ import threading
 getting_msg, host, port = True, 'localhost', 8080
 client_locker = threading.Lock()
 
-def show_chat(socket):
+def show_chat(sock):
     while True:
         with client_locker:
             serv_data = sock.recv(1024)
         if not serv_data:
             with client_locker:
-                socket.close()
+                sock.close()
             print("Connection closed")
             break
         print(serv_data.decode())

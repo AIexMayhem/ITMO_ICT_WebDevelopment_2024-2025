@@ -1,6 +1,6 @@
 import socket
 import threading
-from copy import deepcopy, copy
+from copy import copy
 
 
 max_conn_count = 10
@@ -34,10 +34,6 @@ def main():
         threads.append(conn_thread)
         connections.append(conn_socket)
         conn_thread.start()
-
-    for thread in threads:
-        thread.join()
-
 
 if __name__ == "__main__":
     main()
