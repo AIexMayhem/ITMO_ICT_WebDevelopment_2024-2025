@@ -127,23 +127,27 @@
 <h2 id="1">Задание 1</h2>
 <p>Реализовать клиентскую и серверную часть приложения. Клиент отправляет серверу сообщение «Hello, server», и оно должно отобразиться на стороне сервера. В ответ сервер отправляет клиенту сообщение «Hello, client», которое должно отобразиться у клиента.</p>
 <p>Код сервера:</p>
-<pre><code class="language-python">socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+<pre><code class="language-python">import socket
+
+
+socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 socket.bind(('', 8080))
 
 max_user = 1
 response = b&quot;Hello, client&quot;
-
 while True:
     client_data, addr = socket.recvfrom(1024)
     if not client_data:
         break
     print(client_data)
     socket.sendto(response, addr)
-
 socket.close()
 </code></pre>
 <p>Код клиента:</p>
-<pre><code class="language-python">socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+<pre><code class="language-python">import socket
+
+
+socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 while True:
     message = bytes(input(), 'utf-8')
     socket.sendto(message, ('localhost', 8080))
@@ -154,12 +158,44 @@ while True:
 socket.close()
 </code></pre>
 <h2 id="2">Задание 2</h2>
+<p>Реализовать клиентскую и серверную часть приложения. Клиент запрашивает выполнение математической операции, параметры которой вводятся с клавиатуры. Сервер обрабатывает данные и возвращает результат клиенту.</p>
+<p>Вариант операции: Поиск площади параллелограмма</p>
+<p>Код сервера:</p>
+<pre><code class="language-python">import socket
+import math
+
+
+server_socket = socket.socket()
+server_socket.bind(('', 8080))
+
+max_user = 5
+server_socket.listen(max_user)
+while True:
+    client_socket, addr = server_socket.accept()
+    client_data = list(map(lambda x: int(x), client_socket.recv(1024).decode().split()))
+    if not client_data or len(client_data) != 3:
+        print(&quot;Invalid parameters for triangle area task&quot;)
+        client_socket.close()
+        break
+    S = client_data[0] * client_data[1] * math.sin(client_data[2])
+    client_socket.send(bytes(str(S), 'utf-8'))    
+    print(client_data)
+socket.close()
+
+</code></pre>
+<p>Код клиента:</p>
+<pre><code class="language-python">import socket
+
+
+client_socket = socket.socket()
+client_socket.connect(('localhost', 8080))
+print(&quot;Please write the lengths of 2 sides and an angle of the parallelogramm:&quot;)
+client_socket.send(bytes(input(), 'utf-8'))
+res = client_socket.recv(1024)
+print(f&quot;Area = {res.decode()}&quot;)
+client_socket.close()
+</code></pre>
 <ul>
-<li><code>mkdocs new [dir-name]</code> - Create a new project.</li>
-<li><code>mkdocs serve</code> - Start the live-reloading docs server.</li>
-<li><code>mkdocs build</code> - Build the documentation site.</li>
-<li><code>mkdocs -h</code> - Print help message and exit.</li>
-<li></li>
 <li>
 <h2 id="3">Задание 3</h2>
 </li>
