@@ -102,25 +102,17 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#no1" class="nav-link">Лабораторная работа №1</a>
+            <li class="nav-item" data-bs-level="1"><a href="#no3" class="nav-link">Лабораторная работа №3</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#1" class="nav-link">Задание 1</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#2" class="nav-link">Задание 2</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_2" class="nav-link">Схема базы данных</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#3" class="nav-link">Задание 3</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_3" class="nav-link">Модели</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#4" class="nav-link">Задание 4</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#5" class="nav-link">Задание 5</a>
+            <li class="nav-item" data-bs-level="2"><a href="#_4" class="nav-link">Отчеты</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -131,420 +123,187 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="no1">Лабораторная работа №1</h1>
-<h2 id="1">Задание 1</h2>
-<p>Реализовать клиентскую и серверную часть приложения. Клиент отправляет серверу сообщение «Hello, server», и оно должно отобразиться на стороне сервера. В ответ сервер отправляет клиенту сообщение «Hello, client», которое должно отобразиться у клиента.</p>
-<p>Код сервера:</p>
-<pre><code class="language-python">import socket
-
-socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-socket.bind(('', 8080))
-
-max_user = 1
-response = b&quot;Hello, client&quot;
-while True:
-    client_data, addr = socket.recvfrom(1024)
-    if not client_data:
-        break
-    print(client_data)
-    socket.sendto(response, addr)
-socket.close()
-</code></pre>
-<p>Код клиента:</p>
-<pre><code class="language-python">import socket
-
-socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-while True:
-    message = bytes(input(), 'utf-8')
-    socket.sendto(message, ('localhost', 8080))
-    response = socket.recv(1024)
-    if not response:
-        break
-    print(response)
-socket.close()
-</code></pre>
-<h2 id="2">Задание 2</h2>
-<p>Реализовать клиентскую и серверную часть приложения. Клиент запрашивает выполнение математической операции, параметры которой вводятся с клавиатуры. Сервер обрабатывает данные и возвращает результат клиенту.</p>
-<p>Вариант операции: Поиск площади параллелограмма</p>
-<p>Код сервера:</p>
-<pre><code class="language-python">import socket
-import math
-
-server_socket = socket.socket()
-server_socket.bind(('', 8080))
-
-max_user = 5
-server_socket.listen(max_user)
-while True:
-    client_socket, addr = server_socket.accept()
-    client_data = list(map(lambda x: int(x), client_socket.recv(1024).decode().split()))
-    if not client_data or len(client_data) != 3:
-        print(&quot;Invalid parameters for triangle area task&quot;)
-        client_socket.close()
-        break
-    S = client_data[0] * client_data[1] * math.sin(client_data[2])
-    client_socket.send(bytes(str(S), 'utf-8'))    
-    print(client_data)
-socket.close()
-
-</code></pre>
-<p>Код клиента:</p>
-<pre><code class="language-python">import socket
-
-client_socket = socket.socket()
-client_socket.connect(('localhost', 8080))
-print(&quot;Please write the lengths of 2 sides and an angle of the parallelogramm:&quot;)
-client_socket.send(bytes(input(), 'utf-8'))
-res = client_socket.recv(1024)
-print(f&quot;Area = {res.decode()}&quot;)
-client_socket.close()
-</code></pre>
-<h2 id="3">Задание 3</h2>
-<p>Реализовать серверную часть приложения. Клиент подключается к серверу, и в ответ получает HTTP-сообщение, содержащее HTML-страницу, которая сервер подгружает из файла index.html.
-Код сервера:</p>
-<pre><code class="language-python">import socket
-
-
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-socket.bind(('', 8080))
-
-max_conn_count = 5
-
-socket.listen(max_conn_count)
-
-while True:
-    conn_socket, addr = socket.accept()
-    request = conn_socket.recv(1024).decode().split()
-    if request[0] != &quot;GET&quot;:
-        conn_socket.close()
-        print(&quot;Bad Gateway&quot;)
-        conn_socket.send(b'Response 400')
-        conn_socket.close()
-        break
-    print(request)
-    with open('index.html', 'r') as index:
-        response = 'Response 200'
-        print(&quot;OK&quot;)
-        conn_socket.send(response.encode('utf-8'))
-        conn_socket.close()
-</code></pre>
-<p>Код клиента:</p>
-<pre><code class="language-python">import http.client
-
-host = 'localhost'
-client_conn = http.client.HTTPConnection(host, 8080)
-client_conn.request('GET', 'index.html')
-response = client_conn.getresponse()
-print(response.read().decode())
-</code></pre>
-<p>Код HTML-разметки</p>
-<pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;title&gt;WEB Lab1-3&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt; Hello, it's html page, delivered from python socket server. &lt;/h1&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-<h2 id="4">Задание 4</h2>
-<p>Реализовать двухпользовательский или многопользовательский чат. Для максимального количества баллов реализуйте многопользовательский чат.</p>
-<p>Требования:</p>
+<h1 id="no3">Лабораторная работа №3</h1>
+<h3 id="_1">Отель</h3>
+<p>&emsp;Создать программную систему, предназначенную для администратора гостиницы.<br>
+&emsp;Такая система должна обеспечивать хранение сведений об имеющихся в гостинице
+номерах, о проживающих в гостинице клиентах и о служащих, убирающихся в номерах.
+Количество номеров в гостинице известно, и имеются номера трех типов: одноместный,
+двухместный и трехместный, отличающиеся стоимостью проживания в сутки. В каждом
+номере есть телефон.<br>
+&emsp;О каждом проживающем должна храниться следующая информация: номер
+паспорта, фамилия, имя, отчество, город, из которого он прибыл, дата поселения в
+гостинице, выделенный гостиничный номер.<br>
+&emsp;О служащих гостиницы должна быть известна информация следующего содержания:
+фамилия, имя, отчество, где (этаж) и когда (день недели) он убирает. Служащий
+гостиницы убирает все номера на одном этаже в определенные дни недели, при этом в
+разные дни он может убирать разные этажи.</p>
+<p>&emsp;Работа с системой предполагает получение следующей информации:</p>
 <ul>
-<li>Обязательно использовать библиотеку socket.</li>
-<li>Для многопользовательского чата необходимо использовать библиотеку threading.</li>
+<li>о клиентах, проживавших в заданном номере, в заданный период времени;</li>
+<li>о количестве клиентов, прибывших из заданного города,</li>
+<li>о том, кто из служащих убирал номер указанного клиента в заданный день недели,</li>
+<li>сколько в гостинице свободных номеров;</li>
+<li>список клиентов с указанием места жительства, которые проживали в те же дни, что и заданный клиент, в определенный период времени.</li>
 </ul>
-<p>Код сервера:</p>
-<pre><code class="language-python">import socket
-import threading
-from copy import copy
-
-
-max_conn_count = 10
-locker = threading.Lock()
-threads = []
-connections = []
-
-def threaded_handle(conn, address):
-    while True:
-        data = conn.recv(1024)
-        if not data:
-            conn.close()
-            print(f&quot;{address} connection interrupted&quot;)
-            break
-        msg = address[0] + &quot;:&quot; + str(address[1]) + &quot; send a message: &quot; + data.decode()
-        print(msg)
-        with locker:
-            conn_copy = copy(connections)
-        for c in conn_copy:
-            c.sendall(msg.encode('utf-8'))
-
-
-def main():
-    a_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    a_socket.bind(('', 8080))
-    a_socket.listen(max_conn_count)
-
-    while True:
-        conn_socket, addr = a_socket.accept()
-        conn_thread = threading.Thread(target=threaded_handle, args=(conn_socket, addr,))
-        threads.append(conn_thread)
-        connections.append(conn_socket)
-        conn_thread.start()
-
-if __name__ == &quot;__main__&quot;:
-    main()
-</code></pre>
-<p>Код клиента:</p>
-<pre><code class="language-python">import socket
-import threading
-
-
-getting_msg, host, port = True, 'localhost', 8080
-client_locker = threading.Lock()
-
-def show_chat(sock):
-    while True:
-        with client_locker:
-            serv_data = sock.recv(1024)
-        if not serv_data:
-            with client_locker:
-                sock.close()
-            print(&quot;Connection closed&quot;)
-            break
-        print(serv_data.decode())
-
-
-def main_client():
-    client_socket = socket.socket()
-    client_socket.connect((host, port))
-    chat_thread = threading.Thread(target=show_chat, args=(client_socket,))
-    chat_thread.start()
-
-    while getting_msg:
-        new_msg = input().encode('utf-8')
-        client_socket.send(new_msg)
-
-    chat_thread.join()
-
-
-if __name__ == &quot;__main__&quot;:
-    main_client()
-</code></pre>
-<h2 id="5">Задание 5</h2>
-<p>Написать простой веб-сервер для обработки GET и POST HTTP-запросов с помощью библиотеки socket в Python.</p>
-<p>Сервер должен:</p>
+<p>&emsp;Администратор должен иметь возможность выполнить следующие операции:</p>
 <ul>
-<li>Принять и записать информацию о дисциплине и оценке по дисциплине.</li>
-<li>Отдать информацию обо всех оценках по дисциплинам в виде HTML-страницы.</li>
+<li>принять на работу или уволить служащего гостиницы;</li>
+<li>изменить расписание работы служащего;</li>
+<li>поселить или выселить клиента.</li>
 </ul>
-<p>Web-страница с оценками выглядит так:
-<img alt="Оценки" src="../../assets/lab_1/grades.png" title="Оценки" /></p>
-<p>Код сервера:</p>
-<pre><code class="language-python">import socket
-import json
-from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, parse_qs
-from datetime import datetime
-
-max_headers = 100
-
-
-class HTTPRequest:
-    def __init__(self, method, url, version, headers, r_body):
-        self.method = method
-        self.url = url
-        self.version = version
-        self.headers = headers
-        self.body = r_body
-
-    @property
-    def parsed_url(self):
-        return urlparse(self.url)
-
-    @property
-    def query(self):
-        return parse_qs(self.parsed_url.query)
-
-
-class HTTPResponse:
-    def __init__(self, code, status, version, headers=None, body=None):
-        self.code = code
-        self.status = status
-        self.version = version
-        self.headers = headers
-        self.body = body
-
-    def compile(self):
-        resp = f&quot;{self.version} {self.code} {self.status}\n&quot;
-        if self.headers:
-            for header, value in self.headers.items():
-                resp += f&quot;{header}: {value}\n&quot;
-        if self.body:
-            resp += f&quot;\n{self.body}&quot;
-        return resp
-
-
-def compile_html(req, filename, json_file):
-    soup = bs(open(filename, 'r+'), &quot;html.parser&quot;)
-    caption = soup.find('h2', {'id': 'subj_name'})
-    mark_list = soup.find('ul', {'id': 'marks'})
-    try:
-        subj = req.query['subject'][0]
-        caption.string = f&quot;Оценки по предмету: {subj}&quot;
-        with open(json_file, 'r') as grades_file:
-            subjects = json.load(grades_file)
-            marks = subjects[subj]
-        for mark in marks:
-            mark_li = soup.new_tag('li')
-            mark_li.string = mark
-            mark_list.append(mark_li)
-        return soup.prettify('utf-8').decode()
-    except KeyError:
-        raise Exception(&quot;Wrong request parameters&quot;)
-
-
-class HTTPServer:
-    def __init__(self, ip, port):
-        self.ip = ip
-        self.port = port
-        self.name = &quot;MyHTTPServer&quot;
-        self.http_v = &quot;HTTP/1.1&quot;
-
-    def serve_forever(self):
-        serv_sock = socket.socket()
-        serv_sock.bind((self.ip, self.port))
-        serv_sock.listen()
-        try:
-            while True:
-                conn_socket, addr = serv_sock.accept()
-                self.serve_client(conn_socket)
-        finally:
-            serv_sock.close()
-
-    def serve_client(self, connection):
-        req = self.parse_request(connection)
-        if req:
-            resp = self.handle_request(req).compile()
-            resp_encoded = resp.encode()
-            connection.sendall(resp_encoded)
-        connection.close()
-
-    def parse_request(self, connection):
-        with connection.makefile('rb') as req_file:
-            raw_first_line = req_file.readline()
-            first_line = str(raw_first_line, 'utf-8')
-            method, url, version = first_line.split()
-            headers = self.parse_headers(req_file)
-            return HTTPRequest(method, url, version, headers, req_file)
-
-    def parse_headers(self, rfile):
-        headers = dict()
-        while len(headers) &lt;= max_headers:
-            r_line = rfile.readline().decode('utf-8')
-            if r_line == '\n' or r_line == '' or r_line == '\r\n':
-                return headers
-            header, value = tuple(r_line.split())
-            headers[header] = value
-        raise Exception('too many headers')
-
-    def handle_request(self, req):
-        if req.parsed_url.path == &quot;/grades&quot;:
-            if req.method == &quot;GET&quot;:
-                html = compile_html(req, &quot;html/index.html&quot;,
-                                    &quot;json/grades.json&quot;)
-                resp_headers = {
-                    &quot;Server&quot;: self.name,
-                    &quot;Date&quot;: str(datetime.now()),
-                    &quot;Content-Length&quot;: len(html),
-                    &quot;Content-Type&quot;: &quot;text/html; charset=utf-8&quot;
-                }
-                return HTTPResponse(200, &quot;OK&quot;, self.http_v, resp_headers, html)
-            elif req.method == &quot;POST&quot;:
-                with open(&quot;json/grades.json&quot;, &quot;r+&quot;) as grades_file:
-                    subjects = json.load(grades_file)
-                    try:
-                        subjects[req.query[&quot;subject&quot;][0]].append(req.query[&quot;mark&quot;][0])
-                    except KeyError:
-                        raise Exception(&quot;Wrong request parameters&quot;)
-                    grades_file.seek(0)
-                    json.dump(subjects, grades_file)
-                    grades_file.truncate()
-                return HTTPResponse(204, &quot;Created&quot;, self.http_v)
-        else:
-            return HTTPResponse(400, &quot;Bad Request&quot;, self.http_v)
-
-
-if __name__ == '__main__':
-    host = '127.0.0.1'
-    _port = 8080
-    serv = HTTPServer(host, _port)
-    try:
-        serv.serve_forever()
-    except KeyboardInterrupt:
-        pass
+<p>&emsp;Необходимо предусмотреть также возможность автоматической выдачи отчета о
+работе гостиницы за указанный квартал текущего года. Такой отчет должен содержать
+следующие сведения:</p>
+<ul>
+<li>число клиентов за указанный период в каждом номере;</li>
+<li>количество номеров не каждом этаже;</li>
+<li>общая сумма дохода за каждый номер;</li>
+<li>суммарный доход по всей гостинице.</li>
+</ul>
+<h2 id="_2">Схема базы данных</h2>
+<p><img alt="Схема" src="../../assets/lab_3/scheme.png" title="Отели" /></p>
+<h2 id="_3">Модели</h2>
+<p>Модель профиля аккаунта</p>
+<pre><code class="language-python">class UserProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE, related_name=&quot;profile&quot;)
+    is_staff_member = models.BooleanField(default=False, verbose_name='Сотрудник отеля')
+    passport_number = models.CharField(max_length=20, unique=True, verbose_name='Номер паспорта')
+    last_name = models.CharField(max_length=100, verbose_name='Фамилия')
+    first_name = models.CharField(max_length=100, verbose_name='Имя')
+    middle_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='Отчество')
+    city = models.CharField(max_length=100, verbose_name='Город')
+    bookings = models.ManyToManyField(&quot;booking.Booking&quot;, blank=True, null=True, related_name=&quot;user_profile&quot;, verbose_name='Брони')
 </code></pre>
-<p>Код клиента:</p>
-<pre><code class="language-python">import os
-import http.client
-import webbrowser
-
-
-class HTTPClient:
-    def __init__(self):
-        self.conn = None
-
-    def connect_to(self, ip, port):
-        self.conn = http.client.HTTPConnection(ip, port)
-
-    def post_mark(self, subj, grade):
-        if not self.conn:
-            raise Exception('No connection provided')
-        self.conn.request('POST', f&quot;/grades?subject={subj}&amp;mark={grade}&quot;)
-        serv_response = self.conn.getresponse()
-        print(serv_response.status, serv_response.reason)
-
-    def get_marks(self, subj):
-        if not self.conn:
-            raise Exception('No connection provided')
-        self.conn.request('GET', f&quot;/grades?subject={subj}&quot;)
-        serv_response = self.conn.getresponse()
-        path = &quot;html/client.html&quot;
-        body = serv_response.read()
-        with open(path, &quot;wb&quot;) as cli_html:
-            cli_html.write(body)
-        webbrowser.open('file://' + os.path.realpath(path), new=2)
-
-
-if __name__ == &quot;__main__&quot;:
-    _ip, _port = '127.0.0.1', 8080
-    client = HTTPClient()
-    while True:
-        client.connect_to(_ip, _port)
-        subject = input(&quot;Выберите предмет: &quot;)
-        choice = int(input(&quot;1 - Выставить(POST) оценку\n2 - Получить(GET) оценки\n&quot;))
-        if choice == 1:
-            mark = int(input(&quot;Введите оценку от 2(неуд) до 5(отл): &quot;))
-            if mark &lt; 2 or mark &gt; 5:
-                raise Exception('Оценка должна быть от 2(неуд) до 5(отл)')
-            client.post_mark(subject, mark)
-            continue
-        client.get_marks(subject)
+<p>Модель для регистрации броней</p>
+<pre><code class="language-python">class Booking(models.Model):
+    book_date = models.DateField(verbose_name='Дата брони')
+    prepayment = models.IntegerField(verbose_name='Предоплата')
+    night_count = models.IntegerField(default=1, verbose_name='Количество ночей')
+    guest_count = models.IntegerField(default=1, verbose_name='Количество гостей')
+    client_preference = models.CharField(max_length=50, verbose_name='Предпочтения клиента')
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name='Комната')
+    guest_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Гость')
+    statuses = [
+        (&quot;reg&quot;, &quot;Зарегистрирована&quot;),
+        (&quot;conf&quot;, &quot;Подтверждена&quot;),
+        (&quot;done&quot;,&quot;Завершена&quot;),
+        (&quot;can&quot;, &quot;Отменена&quot;)
+    ]
+    status = models.CharField(max_length = 20, choices=statuses, verbose_name='Статус')
 </code></pre>
-<p>JSON c оценками </p>
-<pre><code class="language-json">{
-  &quot;Math&quot;: [&quot;4&quot;, &quot;4&quot;, &quot;5&quot;, &quot;4&quot;, &quot;4&quot;, &quot;2&quot;, &quot;5&quot;, &quot;2&quot;],
-  &quot;Geography&quot;: [&quot;3&quot;, &quot;4&quot;],
-  &quot;Informatics&quot;: [&quot;2&quot;, &quot;5&quot;],
-  &quot;Chemistry&quot;: [&quot;2&quot;, &quot;4&quot;],
-  &quot;History&quot;: [&quot;5&quot;, &quot;4&quot;, &quot;4&quot;, &quot;2&quot;],
-  &quot;English&quot;: [&quot;4&quot;, &quot;4&quot;, &quot;2&quot;, &quot;4&quot;, &quot;2&quot;],
-  &quot;PE&quot;: [&quot;2&quot;, &quot;5&quot;],
-  &quot;Physics&quot;: [&quot;5&quot;, &quot;4&quot;]
-}
+<p>Модели для типа комнаты и этажа соответственно</p>
+<pre><code class="language-python">class RoomType(models.Model):
+    room_category = models.CharField(max_length=50, primary_key=True, verbose_name='Категория номера')
+    night_cost = models.IntegerField(default=0, verbose_name='Стоимость за ночь')
+    guest_count = models.IntegerField(default=2, verbose_name='Количество спальных мест')
+    description = models.CharField(max_length=100, verbose_name='Описание')
 
+class Floor(models.Model):
+    fix_date = models.DateField(auto_now=True, verbose_name='Дата ремонта')
+    clean_date = models.DateField(auto_now=True, verbose_name='Дата уборки')
+    rooms_count = models.IntegerField(default=0, verbose_name='Количество номеров')
+    cleaner = models.ManyToManyField(&quot;staff.Employee&quot;, related_name=&quot;cleaner&quot;, verbose_name='Уборщик')
+</code></pre>
+<p>Модель для номера отеля</p>
+<pre><code class="language-python">class Room(models.Model):
+    room_category = models.ForeignKey(RoomType, on_delete=models.CASCADE, verbose_name='Категория номера')
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, verbose_name='Этаж')
+    phone = models.IntegerField(default=0, verbose_name='Телефон')
+    is_occupied = models.BooleanField(default=False, verbose_name='Занятость номера')
+    is_active = models.BooleanField(default=True, verbose_name='Готовность номера')
+    guest_count = models.IntegerField(default=2, verbose_name='Количество гостей')
+    description = models.CharField(max_length=100, verbose_name='Описание')
+</code></pre>
+<p>Модель для регистрации уборок этажа</p>
+<pre><code class="language-python">class RoomClean(models.Model):
+    complaints = models.CharField(max_length=50, verbose_name='Жалобы')
+    clean_mark = models.IntegerField(default=5, verbose_name='Оценка')
+    clean_date = models.DateField(auto_now_add=True, verbose_name='Дата уборки')
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, verbose_name='Этаж')
+    worker_id = models.ForeignKey(Employee, blank=True, null=True, on_delete=models.CASCADE, verbose_name='Уборщик')
+</code></pre>
+<p>А также модель для сотрудников</p>
+<pre><code class="language-python">class Employee(models.Model):
+    passport = models.CharField(max_length=50, verbose_name='Паспорт')
+    full_name = models.CharField(max_length=50, verbose_name='ФИО')
+    employee_date = models.DateField(auto_now_add=True, verbose_name='Дата трудоустройства')
+    fire_date = models.DateField(null=True, blank=True, verbose_name='Дата увольнения')
+    salary = models.IntegerField(verbose_name='Оклад')
+    rank = models.CharField(max_length=50, verbose_name='Должность')
+</code></pre>
+<h2 id="_4">Отчеты</h2>
+<p>1) О клиентах, проживавших в заданном номере, в заданный период времени</p>
+<ul>
+<li>URL: /api/books/get_books/</li>
+<li>Method: GET</li>
+<li>Auth required: YES</li>
+</ul>
+<pre><code class="language-python">@api_view([&quot;GET&quot;])
+@csrf_exempt
+def get_books(request):
+    books = Booking.objects.all().order_by('book_date')
+    serializer = BookingSerializer(books, many=True)
+    return JsonResponse({'books': serializer.data}, safe=False, status=status.HTTP_200_OK)
+</code></pre>
+<p>2) О количестве клиентов, прибывших из заданного города</p>
+<ul>
+<li>URL: /api/accounts/get_guests/</li>
+<li>Method: GET</li>
+<li>Auth required: YES</li>
+</ul>
+<pre><code class="language-python">@api_view([&quot;GET&quot;])
+@csrf_exempt
+def get_guests(request):
+    city = request.query_params.get('city')
+    guests = UserProfile.objects.filter(city=city)
+    serializer = UserProfileSerializer(guests, many=True)
+    return JsonResponse({'count': len(serializer.data)}, safe=False, status=status.HTTP_200_OK)
+</code></pre>
+<p>3) О том, кто из служащих убирал номер указанного клиента в заданный день недели</p>
+<ul>
+<li>URL: /api/books/get_books/</li>
+<li>Method: GET</li>
+<li>Auth required: YES</li>
+</ul>
+<pre><code class="language-python">@api_view([&quot;GET&quot;])
+@csrf_exempt
+def get_books(request):
+    books = Booking.objects.all().order_by('book_date')
+    serializer = BookingSerializer(books, many=True)
+    return JsonResponse({'books': serializer.data}, safe=False, status=status.HTTP_200_OK)
+
+</code></pre>
+<p>4) Сколько в гостинице свободных номеров</p>
+<ul>
+<li>URL: /api/hotel/get_empty_rooms/</li>
+<li>Method: GET</li>
+<li>Auth required: YES</li>
+</ul>
+<pre><code class="language-python">@api_view([&quot;GET&quot;])
+@csrf_exempt
+def get_empty_rooms(request):
+    rooms = Room.objects.filter(is_occupied=True)
+    serializer = RoomSerializer(rooms, many=True)
+    return JsonResponse({'rooms': len(serializer.data)}, safe=False, status=status.HTTP_200_OK)
+</code></pre>
+<p>5) список клиентов с указанием места жительства, которые проживали в те же дни, что и заданный клиент, в определенный период времени</p>
+<ul>
+<li>URL: /api/accounts/get_guests_on_neighbour/</li>
+<li>Method: GET</li>
+<li>Auth required: YES</li>
+</ul>
+<pre><code class="language-python">@api_view([&quot;GET&quot;])
+@csrf_exempt
+def get_guests_on_neighbour(request):
+    name = request.query_params.get('name')
+    guests = UserProfile.objects.get(last_name=name)
+    dates = Booking.objects.get(guest_id=guests).book_date
+    other_books = Booking.objects.filter(book_date=dates)
+    data = {'guests': []}
+    for book in other_books:
+        data['guests'].append([book.guest_id.last_name, book.guest_id.city])
+    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
 </code></pre></div>
             </div>
         </div>
